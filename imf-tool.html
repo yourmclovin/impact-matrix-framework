@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Impact Matrix Framework (IMF) — Prioritization</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa7c7;
+      --accent-start:#3b82f6;
+      --accent-end:#06b6d4;
+      --success:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --radius:14px;
+      --shadow: 0 8px 30px rgba(2,6,23,0.7);
+      font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background: linear-gradient(180deg,#071029 0%, #041022 45%, #061728 100%);
+      color: #e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .app{
+      max-width:1200px;
+      margin:28px auto;
+      padding:28px;
+    }
+
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:22px;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      background: linear-gradient(135deg,var(--accent-start),var(--accent-end));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow);
+      flex-shrink:0;
+    }
+    .logo svg{filter:drop-shadow(0 6px 18px rgba(6,182,212,0.16));}
+    h1{
+      font-size:20px;
+      margin:0;
+      letter-spacing:-0.2px;
+    }
+    p.lead{
+      margin:4px 0 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      background: linear-gradient(180deg,var(--glass), var(--glass-2));
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      overflow:hidden;
+    }
+
+    .form-row{
+      display:flex;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    input[type="text"], textarea, input[type="number"], select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      color:#e6eef8;
+      outline:none;
+      transition:box-shadow .18s ease, transform .12s ease;
+      font-size:14px;
+    }
+    textarea{min-height:80px; resize:vertical;}
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    input:focus, textarea:focus, select:focus{
+      box-shadow: 0 6px 20px rgba(59,130,246,0.12);
+      transform: translateY(-1px);
+    }
+
+    .small{font-size:13px; color:var(--muted);}
+
+    .scale-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .scale-item{
+      background: rgba(255,255,255,0.02);
+      padding:8px 10px;
+      border-radius:8px;
+      min-width:48px;
+      text-align:center;
+      font-weight:600;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+      user-select:none;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .scale-item.selected{
+      background: linear-gradient(90deg,var(--accent-start), var(--accent-end));
+      color:white;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(6,182,212,0.12);
+      border: none;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .big-score{
+      font-size:20px;
+      font-weight:700;
+      background: linear-gradient(90deg,#fff,#cfeaff);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .btn{
+      background: linear-gradient(90deg,var(--accent-start),var(--accent-end));
+      color:white;
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      box-shadow: 0 8px 30px rgba(3,105,161,0.12);
+      transition: transform .12s ease;
+    }
+    .btn.secondary{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.06);
+      color:var(--muted);
+      box-shadow:none;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .right{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border-radius:12px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:900px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:8px;
+      overflow:hidden;
+    }
+
+    thead th{
+      text-align:left;
+      padding:14px 18px;
+      font-size:12px;
+      color:var(--muted);
+      position:sticky;
+      top:0;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+    tbody td{
+      padding:12px 18px;
+      border-top:1px solid rgba(255,255,255,0.02);
+      vertical-align:middle;
+      font-size:13px;
+      color:#e6eef8;
+    }
+
+    .score-badge{
+      font-weight:700;
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-block;
+      min-width:92px;
+      text-align:center;
+      box-shadow: 0 6px 18px rgba(6,182,212,0.06);
+      background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+
+    .chip{
+      padding:6px 9px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:12px;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .chip.high{ background: linear-gradient(90deg,#0ea5a0,#06b6d4); color:white; }
+    .chip.medium{ background: linear-gradient(90deg,#f59e0b,#f97316); color:white; }
+    .chip.low{ background: linear-gradient(90deg,#64748b,#334155); color:white; }
+
+    .action-btn{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.04);
+      padding:8px 10px;
+      border-radius:8px;
+      color:var(--muted);
+      cursor:pointer;
+    }
+
+    .matrix-card{
+      flex:1;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:16px;
+      min-width:320px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.5);
+    }
+    .matrix-grid{
+      width:100%;
+      height:320px;
+      border-radius:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      padding:12px;
+    }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      table{ min-width:700px; }
+      .matrix-grid { height:280px; }
+    }
+
+    tbody tr{
+      transition: background .12s ease, transform .08s ease;
+    }
+    tbody tr:hover{
+      background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+      transform: translateY(-3px);
+    }
+
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M8 9H16V15H8z" fill="#06B6D4"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Impact Matrix Framework (IMF)</h1>
+        <p class="lead">A repeatable feature prioritization tool. Add ideas, see scores, and visualize priorities.</p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+          <div>
+            <div class="muted" style="font-weight:700;">Add feature</div>
+            <div class="small" style="margin-top:4px;">Enter parameters — IMF score updates in real-time.</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" id="addFeatureBtn">Add</button>
+            <button class="btn secondary" id="clearBtn">Clear</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label>Feature Name</label>
+          <input type="text" id="inputName" placeholder="New checkout flow..." />
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label>Description</label>
+          <textarea id="inputDesc" placeholder="Short description (optional)"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <label>Reach (0-10,000)</label>
+            <input type="number" id="inputReach" min="0" max="10000" value="1000" />
+          </div>
+          <div style="flex:1;">
+            <label>Effort (person-weeks)</label>
+            <input type="number" id="inputEffort" min="0" step="0.1" value="4" />
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label>Impact</label>
+          <div class="scale-row" id="impactScale">
+            <div class="scale-item" data-value="1">1</div>
+            <div class="scale-item" data-value="2">2</div>
+            <div class="scale-item" data-value="3">3</div>
+            <div class="scale-item" data-value="4">4</div>
+            <div class="scale-item" data-value="5">5</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label>Strategic Alignment</label>
+          <div class="scale-row" id="strategicScale">
+            <div class="scale-item" data-value="1">1</div>
+            <div class="scale-item" data-value="2">2</div>
+            <div class="scale-item" data-value="3">3</div>
+            <div class="scale-item" data-value="4">4</div>
+            <div class="scale-item" data-value="5">5</div>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom:12px;">
+          <div style="flex:1;">
+            <label>Confidence</label>
+            <select id="inputConfidence">
+              <option value="1.0">High (1.0)</option>
+              <option value="0.8">Medium (0.8)</option>
+              <option value="0.5">Low (0.5)</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label>Feature Type</label>
+            <select id="inputType">
+              <option value="2.0">Delighter (2.0x)</option>
+              <option value="1.5">Performance (1.5x)</option>
+              <option value="1.5">Strategic Bet (1.5x)</option>
+              <option value="1.0">Must-Have (1.0x)</option>
+              <option value="1.0">Technical Debt (1.0x)</option>
+              <option value="0.5">Nice-to-Have (0.5x)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
+          <div>
+            <div class="small muted">IMF Score (real-time)</div>
+            <div class="big-score" id="liveScore">0</div>
+            <div class="muted" style="font-size:12px; margin-top:4px;">[(R × I × S × C) / E] × W</div>
+          </div>
+          <div>
+            <button class="btn" id="exportCsvBtn">Export CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="card table-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <div class="muted" style="font-weight:700">Features (ranked)</div>
+              <div class="small muted">Sorted by IMF Score — highest first</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div class="chip high">High</div>
+              <div class="chip medium">Medium</div>
+              <div class="chip low">Low</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Feature</th>
+                <th>IMF Score</th>
+                <th>Reach</th>
+                <th>Impact</th>
+                <th>Strategic</th>
+                <th>Confidence</th>
+                <th>Effort</th>
+                <th>Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="featuresTableBody">
+            </tbody>
+          </table>
+        </div>
+
+        <footer>
+          <div class="muted">IMF: [(Reach × Impact × Strategic × Confidence) / Effort] × Type multiplier</div>
+          <div class="muted">Made with care — IMF Tool</div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const LS_KEY = 'imf_features_v1';
+      let features = loadFromLocalStorage();
+      let activeImpact = 3;
+      let activeStrategic = 3;
+
+      function persist(){ localStorage.setItem(LS_KEY, JSON.stringify(features)); }
+      function loadFromLocalStorage(){
+        try {
+          const str = localStorage.getItem(LS_KEY);
+          return str ? JSON.parse(str) : [];
+        } catch(e){ return []; }
+      }
+
+      function initScale(scaleEl, initial){
+        const items = Array.from(scaleEl.querySelectorAll('.scale-item'));
+        items.forEach(it=>{
+          const v = Number(it.dataset.value);
+          if(v === initial) it.classList.add('selected');
+          it.addEventListener('click', ()=>{
+            items.forEach(x=>x.classList.remove('selected'));
+            it.classList.add('selected');
+            if(scaleEl.id === 'impactScale') activeImpact = v;
+            else activeStrategic = v;
+            calculateLiveScore();
+          });
+        });
+      }
+
+      function calcIMFScore(obj){
+        const R = Number(obj.reach) || 0;
+        const I = Number(obj.impact) || 1;
+        const S = Number(obj.strategic) || 1;
+        const C = Number(obj.confidence) || 1;
+        let E = Number(obj.effort) || 0;
+        if(E <= 0) E = 0.1;
+        const W = Number(obj.typeMultiplier) || 1;
+        return Number((((R * I * S * C) / E) * W).toFixed(2));
+      }
+
+      function calculateLiveScore(){
+        const score = calcIMFScore({
+          reach: Number(document.getElementById('inputReach').value||0),
+          impact: activeImpact,
+          strategic: activeStrategic,
+          confidence: Number(document.getElementById('inputConfidence').value),
+          effort: Number(document.getElementById('inputEffort').value)||0,
+          typeMultiplier: Number(document.getElementById('inputType').value)
+        });
+        document.getElementById('liveScore').textContent = new Intl.NumberFormat().format(score);
+      }
+
+      function addFeatureFromForm(){
+        const name = (document.getElementById('inputName').value || '').trim();
+        if(!name) { alert('Please provide a feature name'); return; }
+        const feature = {
+          id: 'f_' + Date.now(),
+          name,
+          description: document.getElementById('inputDesc').value.trim(),
+          reach: Number(document.getElementById('inputReach').value||0),
+          impact: activeImpact,
+          strategic: activeStrategic,
+          confidence: Number(document.getElementById('inputConfidence').value),
+          effort: Number(document.getElementById('inputEffort').value)||0,
+          typeMultiplier: Number(document.getElementById('inputType').value),
+          typeLabel: document.getElementById('inputType').options[document.getElementById('inputType').selectedIndex].text
+        };
+        feature.score = calcIMFScore(feature);
+        features.push(feature);
+        persist();
+        renderAll();
+        document.getElementById('inputName').value = '';
+        document.getElementById('inputDesc').value = '';
+      }
+
+      function removeFeature(id){
+        if(!confirm('Remove this feature?')) return;
+        features = features.filter(f => f.id !== id);
+        persist();
+        renderAll();
+      }
+
+      function rankFeaturesAndAssignPriority(arr){
+        arr.forEach(f => f.score = calcIMFScore(f));
+        const sorted = arr.slice().sort((a,b)=>b.score - a.score);
+        const n = sorted.length;
+        const topN = Math.ceil(n * 0.3);
+        const medN = Math.ceil(n * 0.4);
+        const assignments = {};
+        sorted.forEach((f,i)=>{
+          let pr = 'low';
+          if(i < topN) pr = 'high';
+          else if(i < (topN + medN)) pr = 'medium';
+          assignments[f.id] = { rank: i+1, priority: pr };
+        });
+        return assignments;
+      }
+
+      function renderTable(){
+        const tbody = document.getElementById('featuresTableBody');
+        tbody.innerHTML = '';
+        if(features.length === 0){
+          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:36px;">No features yet</td></tr>';
+          return;
+        }
+        features.forEach(f => f.score = calcIMFScore(f));
+        features.sort((a,b)=>b.score - a.score);
+        const assignments = rankFeaturesAndAssignPriority(features);
+        features.forEach(f=>{
+          const pr = assignments[f.id]?.priority || 'low';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="font-weight:800;">${assignments[f.id]?.rank}</td>
+            <td><div style="font-weight:700;">${f.name}</div><div class="small muted">${f.description||''}</div></td>
+            <td><div class="score-badge">${new Intl.NumberFormat().format(f.score)}</div><div style="margin-top:6px;"><span class="chip ${pr}">${pr.toUpperCase()}</span></div></td>
+            <td>${new Intl.NumberFormat().format(f.reach)}</td>
+            <td>${f.impact}</td>
+            <td>${f.strategic}</td>
+            <td>${f.confidence >= 1 ? 'High' : f.confidence >= 0.8 ? 'Medium' : 'Low'}</td>
+            <td>${f.effort}</td>
+            <td>${f.typeLabel}</td>
+            <td><button class="action-btn" data-id="${f.id}">Remove</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        tbody.querySelectorAll('button[data-id]').forEach(btn=>{
+          btn.addEventListener('click', ()=>removeFeature(btn.dataset.id));
+        });
+      }
+
+      function exportToCsv(){
+        if(!features.length){ alert('No features to export'); return; }
+        const hdr = ['Rank','Feature','Description','IMF Score','Reach','Impact','Strategic','Confidence','Effort','Type'];
+        features.forEach(f => f.score = calcIMFScore(f));
+        features.sort((a,b)=>b.score - a.score);
+        const assignments = rankFeaturesAndAssignPriority(features);
+        const lines = [hdr.join(',')];
+        features.forEach(f=>{
+          lines.push([assignments[f.id]?.rank, `"${f.name}"`, `"${f.description||''}"`, f.score, f.reach, f.impact, f.strategic, f.confidence, f.effort, `"${f.typeLabel}"`].join(','));
+        });
+        const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'imf_export.csv';
+        a.click();
+      }
+
+      function renderAll(){
+        calculateLiveScore();
+        renderTable();
+      }
+
+      initScale(document.getElementById('impactScale'), 3);
+      initScale(document.getElementById('strategicScale'), 3);
+      document.getElementById('inputReach').addEventListener('input', calculateLiveScore);
+      document.getElementById('inputEffort').addEventListener('input', calculateLiveScore);
+      document.getElementById('inputConfidence').addEventListener('change', calculateLiveScore);
+      document.getElementById('inputType').addEventListener('change', calculateLiveScore);
+      document.getElementById('addFeatureBtn').addEventListener('click', addFeatureFromForm);
+      document.getElementById('clearBtn').addEventListener('click', ()=>{ if(confirm('Clear all?')){ features=[]; persist(); renderAll(); }});
+      document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

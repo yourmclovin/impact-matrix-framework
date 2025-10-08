@@ -1,0 +1,15 @@
+Rank,Feature Name,Description,IMF Score,Reach,Impact,Strategic Alignment,Confidence,Effort (person-weeks),Feature Type,Type Multiplier
+1,In-app Guided Tours,Contextual walkthroughs and discoverability overlays to improve new user activation.,62400.00,5200,3,4,1.0,2,Delighter,2.0
+2,Two-Factor Authentication (2FA),Add optional 2FA for improved account security and compliance.,36266.67,6800,4,4,1.0,3,Must-Have,1.0
+3,SmartWorkspace Recommendations,AI-driven suggestions for project templates automations and content to boost team productivity.,16800.00,4200,4,5,0.8,8,Delighter,2.0
+4,BulkEdit Pro,Powerful bulk edit tools for tasks contacts and properties with undo support.,11250.00,2500,3,4,1.0,4,Performance,1.5
+5,Advanced Reporting Dashboards,Self-serve dashboards with cross-data visualizations and scheduled exports.,10333.33,3100,5,5,0.8,9,Performance,1.5
+6,Public API v2,Expanded public API with webhooks batching and improved auth for third-party integrations.,9600.00,3200,5,5,0.8,10,Strategic Bet,1.5
+7,Single Sign-On (SSO) with SAML/OIDC,Enterprise SSO support to streamline onboarding and meet security requirements.,9600.00,2400,5,5,0.8,5,Must-Have,1.0
+8,Recurring Tasks Scheduler,Flexible recurring rules for tasks and automation with timezone-aware scheduling.,6750.00,1500,3,3,1.0,3,Performance,1.5
+9,Rate Limiting & Throttling Controls,Introduce rate limits and per-tenant throttling to protect platform stability.,6080.00,7600,2,3,0.8,6,Technical Debt,1.0
+10,Auto-Sync with Salesforce,One-way and two-way sync options with Salesforce for accounts contacts and deals.,3600.00,1800,4,4,0.5,6,Strategic Bet,1.5
+11,Notification Engine Refactor,Refactor and consolidate notification pipelines to reduce latency and failures.,2850.00,7600,3,3,0.5,12,Technical Debt,1.0
+12,SLA Uptime Monitoring & Alerts,Enterprise-facing uptime SLAs with monitoring dashboards and incident alerts.,2560.00,800,4,4,0.8,4,Must-Have,1.0
+13,Offline Mode,Enable viewing and editing key items while offline with background sync.,1028.57,1200,3,2,0.5,7,Delighter,2.0
+14,Custom Themes & Branding,Allow account-wide custom themes brand colors and custom domain support for enterprise customers.,432.00,900,2,3,0.8,5,Nice-to-Have,0.5
